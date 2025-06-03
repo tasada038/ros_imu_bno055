@@ -13,6 +13,7 @@ The BNO055 supports I2C and UART communication. This driver supports I2C only. I
 Install the prerequisites:
 ```
 sudo apt install libi2c-dev
+sudo apt install -y ros-$ROS_DISTRO-imu-*
 ```
 
 and then you are ready to drop this package into a catkin (ROS1) or colcon (ROS2) workspace.
@@ -20,7 +21,12 @@ and then you are ready to drop this package into a catkin (ROS1) or colcon (ROS2
 ## How to run
 ```
 rosrun imu_bno055 bno055_i2c_node        # for ROS1
+
+colcon build --packages-select ros_imu_bno055
+. install/setup.bash
 ros2 run imu_bno055 bno055_i2c_node      # for ROS2
+ros2 launch ros_imu_bno055 imu_bno055.launch.py
+ros2 run imu_complementary_filter complementary_filter_node
 ```
 
 ## Parameters:

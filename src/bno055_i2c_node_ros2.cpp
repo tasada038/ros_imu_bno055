@@ -50,7 +50,7 @@ BNO055I2CNode::BNO055I2CNode()
     : Node("bno055_node") {  // Initialize rate here
     this->declare_parameter<std::string>("device", "/dev/i2c-1");
     this->declare_parameter<int>("address", BNO055_ADDRESS_A);
-    this->declare_parameter<std::string>("frame_id", "imu");
+    this->declare_parameter<std::string>("frame_id", "imu_link");
     this->declare_parameter<double>("rate", 100.0);
 
     this->get_parameter("device", param_device);
@@ -62,13 +62,13 @@ BNO055I2CNode::BNO055I2CNode()
 
     imu->init();
 
-    pub_data = this->create_publisher<sensor_msgs::msg::Imu>("data", 10);
-    pub_raw = this->create_publisher<sensor_msgs::msg::Imu>("raw", 10);
-    pub_mag = this->create_publisher<sensor_msgs::msg::MagneticField>("mag", 10);
-    pub_temp = this->create_publisher<sensor_msgs::msg::Temperature>("temp", 10);
-    pub_status = this->create_publisher<diagnostic_msgs::msg::DiagnosticStatus>("status", 10);
+    pub_data = this->create_publisher<sensor_msgs::msg::Imu>("/bno055/imu/data", 10);
+    pub_raw = this->create_publisher<sensor_msgs::msg::Imu>("/imu/data_raw", 10);
+    pub_mag = this->create_publisher<sensor_msgs::msg::MagneticField>("/imu/mag", 10);
+    pub_temp = this->create_publisher<sensor_msgs::msg::Temperature>("/imu/temp", 10);
+    pub_status = this->create_publisher<diagnostic_msgs::msg::DiagnosticStatus>("/imu/status", 10);
 
-    srv_reset = this->create_service<std_srvs::srv::Trigger>("reset", std::bind(&BNO055I2CNode::onSrvReset, this, std::placeholders::_1, std::placeholders::_2));
+    srv_reset = this->create_service<std_srvs::srv::Trigger>("/imu/reset", std::bind(&BNO055I2CNode::onSrvReset, this, std::placeholders::_1, std::placeholders::_2));
 
     seq = 0;
 
@@ -201,7 +201,7 @@ void BNO055I2CNode::stop() {
 }
 
 bool BNO055I2CNode::onSrvReset(const std::shared_ptr<std_srvs::srv::Trigger::Request> req,
-                               std::shared_ptr<std_srvs::srv::Trigger::Response> res) {
+                                std::shared_ptr<std_srvs::srv::Trigger::Response> res) {
     if(!(imu->reset())) {
         throw std::runtime_error("chip reset failed");
         return false;
